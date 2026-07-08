@@ -12,9 +12,7 @@ assignees: ''
 ### 📂 영역
 - [ ] Frontend
 - [ ] Backend
-- [ ] 둘 다
-- [ ] 인프라/세팅
-- [ ] 문서
+- [ ] Both
 
 ### ✅ Task
 - [ ] 작업 수행
