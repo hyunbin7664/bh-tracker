@@ -9,10 +9,10 @@ assignees: ''
 ### 📌 Description
 - 무엇이 어떻게 문제인지
 
-### 📂 영역
+### 📂 Area
 - [ ] Frontend
 - [ ] Backend
-- [ ] 둘 다
+- [ ] Both
 
 ### ✅ Task
 - [ ] 버그 원인 파악
