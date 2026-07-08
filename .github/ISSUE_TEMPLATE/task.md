@@ -9,7 +9,7 @@ assignees: ''
 ### 📌 Description
 - 작업 내용
 
-### 📂 영역
+### 📂 Area
 - [ ] Frontend
 - [ ] Backend
 - [ ] Both
