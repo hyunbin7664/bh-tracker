@@ -1,9 +1,13 @@
-# API 명세 (v0.3)
+# 부품관리시스템 API 명세 (v0.4)
 
 Base path: `/api/repair-orders`. PRD(`부품관리시스템_PRD.md`) FR 번호 기준으로 정리.
 ERD는 `ERD.md` 참고 — `Part.status`(2단계, ORDERED/RECEIVED, 접수 즉시 ORDERED로 시작 §11-14)는 그대로
 집계 파생 구조지만, 반품 관련(`AWAITING_RETURN`/`RETURNED`)은 §11-11(RO 단위 확정) 이후 **RO 단위
 직접 설정값**으로 바뀌었다.
+
+**v0.4 변경**: 여러 지점이 하나의 시스템을 공용으로 쓰게 되면서(§11-15), 모든 엔드포인트는 로그인
+세션(`공통기능_PRD.md` 참고)의 지점으로 자동 스코핑된다. 즉 조회는 항상 로그인한 지점의 RO만
+대상이며, 생성 시 `orgId`를 요청 본문에 담지 않고 세션에서 자동으로 채운다.
 
 **설계 방향**: 상태 전이별로 액션 엔드포인트를 잘게 나누지 않고, 데이터 수정은 `PATCH` 하나로 통합한다.
 상태값(`status`, `isCheckedIn`, `incomingStatus`의 반품 관련 값 등)도 그냥 필드로 취급해서 자유롭게
@@ -15,6 +19,7 @@ ERD는 `ERD.md` 참고 — `Part.status`(2단계, ORDERED/RECEIVED, 접수 즉�
 ```json
 {
   "id": 1,
+  "orgId": 5,
   "roNumber": "RO-20260904-001",
   "vehicleNumber": "12가3456",
   "customerName": "홍길동",
@@ -39,7 +44,7 @@ ERD는 `ERD.md` 참고 — `Part.status`(2단계, ORDERED/RECEIVED, 접수 즉�
 
 | Method | Path | 설명 | FR |
 |---|---|---|---|
-| POST | `/api/repair-orders` | RO 접수 + 필요 부품 목록 등록 (부품별 `status=ORDERED` 기본값, 접수 즉시 주문중으로 시작 §11-14) | FR-01 |
+| POST | `/api/repair-orders` | RO 접수 + 필요 부품 목록 등록 (부품별 `status=ORDERED` 기본값, 접수 즉시 주문중으로 시작 §11-14). `orgId`는 요청 본문에 담지 않고 로그인 세션에서 자동 지정 (v0.4). `engineerId`는 `is_active=true`인 엔지니어만 선택 가능 | FR-01 |
 
 **Request Body**
 
@@ -64,7 +69,7 @@ ERD는 `ERD.md` 참고 — `Part.status`(2단계, ORDERED/RECEIVED, 접수 즉�
 | Method | Path | 설명 | FR |
 |---|---|---|---|
 | GET | `/api/repair-orders/{id}` | RO 상세 조회 (부품 포함, 부품별 `receivedDate` 표시 §11-10) | FR-16 |
-| GET | `/api/repair-orders` | `tab`, `roNumber`, `engineerId` 쿼리 파라미터로 목록 필터링 (각각 optional, 조합 가능) | FR-12, FR-13 |
+| GET | `/api/repair-orders` | `tab`, `roNumber`, `engineerId` 쿼리 파라미터로 목록 필터링 (각각 optional, 조합 가능). 항상 로그인한 지점(`orgId`)으로 스코핑되어 다른 지점 RO는 조회되지 않음 (v0.4) | FR-12, FR-13 |
 
 **탭 판별 로직** (v0.3: 반품이 항상 RO 단위이므로 v0.2보다 단순해짐 — 더 이상 "반품예정인데 진행중에 남는" 예외 없음)
 
