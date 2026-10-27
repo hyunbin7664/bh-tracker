@@ -81,6 +81,12 @@ erDiagram
     }
 ```
 
+## 공통 컬럼
+
+- 모든 엔티티는 `created_at`(생성 시각), `updated_at`(마지막 수정 시각)을 공통으로 가진다 (`BaseEntity`, JPA Auditing으로
+  자동 기록). 다이어그램에는 반복을 피하려고 생략했다
+- 적용 시점: `Organization`부터 적용(#14), 기존 엔티티(`Engineer`, `RepairOrder`, `Part`)는 각 도메인 작업 이슈에서 함께 적용
+
 ## 상태 전이 요약
 
 ### Part.status (2단계, 초기 단계 전용)
