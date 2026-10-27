@@ -11,9 +11,21 @@ spring:
     properties:
       hibernate:
         format_sql: true
+  session:
+    jdbc:
+      # SPRING_SESSION 테이블이 없으면 생성 (서버 재시작 후에도 로그인 유지)
+      initialize-schema: always
 
 server:
   port: 8080
+  servlet:
+    session:
+      # 로그아웃 전까지 만료 없이 유지 (공통기능_PRD.md COM-03), 사실상 무기한으로 10년
+      timeout: 3650d
+      cookie:
+        max-age: 3650d
+        http-only: true
+        same-site: lax
 
 logging:
   level:

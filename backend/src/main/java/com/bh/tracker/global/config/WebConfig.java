@@ -1,8 +1,12 @@
 package com.bh.tracker.global.config;
 
+import com.bh.tracker.global.auth.LoginOrganizationArgumentResolver;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.web.method.support.HandlerMethodArgumentResolver;
 import org.springframework.web.servlet.config.annotation.CorsRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
+
+import java.util.List;
 
 @Configuration
 public class WebConfig implements WebMvcConfigurer {
@@ -13,6 +17,13 @@ public class WebConfig implements WebMvcConfigurer {
                 .allowedOrigins("http://localhost:3000")
                 .allowedMethods("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS")
                 .allowedHeaders("*")
+                // 세션 쿠키를 주고받기 위해 필요
+                .allowCredentials(true)
                 .maxAge(3600);
+    }
+
+    @Override
+    public void addArgumentResolvers(List<HandlerMethodArgumentResolver> resolvers) {
+        resolvers.add(new LoginOrganizationArgumentResolver());
     }
 }
