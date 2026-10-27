@@ -2,7 +2,7 @@ package com.bh.tracker.domain.auth.service;
 
 import com.bh.tracker.domain.organization.entity.Organization;
 import com.bh.tracker.domain.organization.repository.OrganizationRepository;
-import com.bh.tracker.domain.auth.exception.AuthErrorCode;
+import com.bh.tracker.global.common.exception.BaseErrorCode;
 import com.bh.tracker.global.common.exception.BaseException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -19,9 +19,9 @@ public class AuthService {
 
     public Organization authenticate(Long organizationId, String rawPassword) {
         Organization organization = organizationRepository.findById(organizationId)
-                .orElseThrow(() -> new BaseException(AuthErrorCode.LOGIN_FAILED));
+                .orElseThrow(() -> new BaseException(BaseErrorCode.LOGIN_FAILED));
         if (!passwordEncoder.matches(rawPassword, organization.getPassword())) {
-            throw new BaseException(AuthErrorCode.LOGIN_FAILED);
+            throw new BaseException(BaseErrorCode.LOGIN_FAILED);
         }
         return organization;
     }
