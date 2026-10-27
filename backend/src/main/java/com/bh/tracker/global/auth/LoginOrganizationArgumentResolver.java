@@ -10,6 +10,7 @@ import org.springframework.web.context.request.NativeWebRequest;
 import org.springframework.web.method.support.HandlerMethodArgumentResolver;
 import org.springframework.web.method.support.ModelAndViewContainer;
 
+// @LoginOrganization 파라미터에 세션의 지점 id를 꺼내 넣어준다 (@RequestBody와 같은 원리, 대상이 세션일 뿐)
 public class LoginOrganizationArgumentResolver implements HandlerMethodArgumentResolver {
 
     @Override
