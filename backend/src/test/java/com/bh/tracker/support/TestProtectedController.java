@@ -6,7 +6,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RestController;
 
-// 인증·공통 예외 처리 검증용 테스트 전용 엔드포인트 (실제 도메인 API 변경에 테스트가 흔들리지 않도록 분리)
+// 인증·공통 예외 처리 검증용 테스트 전용 엔드포인트
 @RestController
 public class TestProtectedController {
 

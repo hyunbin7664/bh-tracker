@@ -19,7 +19,7 @@ public class OrganizationController {
 
     private final OrganizationService organizationService;
 
-    // 로그인 전 호출되므로 id, name 외 정보는 노출하지 않음
+    // 로그인 전에 호출되므로 id, name만 노출
     @GetMapping
     public ApiResponse<OrganizationListResponse> search(@RequestParam(required = false) String search) {
         List<OrganizationSummary> items = organizationService.search(search).stream()

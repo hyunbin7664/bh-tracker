@@ -18,7 +18,7 @@ public class Organization extends BaseEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    // 로그인 드롭다운의 선택 기준이라 유일해야 함 (공통기능_PRD.md NFR-02)
+    // 로그인 시 지점 선택 기준 (NFR-02)
     @Column(nullable = false, unique = true, length = 50)
     private String name;
 
@@ -26,7 +26,6 @@ public class Organization extends BaseEntity {
     @Column(nullable = false, length = 100)
     private String password;
 
-    // phone/address/좌표는 부트스트랩 직후 비어있고, 지점이 설정 화면에서 직접 채움 (COM-05)
     @Column(length = 20)
     private String phone;
 

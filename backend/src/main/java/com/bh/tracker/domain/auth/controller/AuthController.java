@@ -21,7 +21,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
 
-// 로그아웃(POST /api/auth/logout)은 SecurityConfig의 logout 설정이 처리
+// 로그아웃은 SecurityConfig의 logout 설정이 처리
 @RestController
 @RequestMapping("/api/auth")
 @RequiredArgsConstructor
@@ -35,13 +35,12 @@ public class AuthController {
                                HttpServletRequest httpRequest, HttpServletResponse httpResponse) {
         Organization organization = authService.authenticate(request.organizationId(), request.password());
 
-        // 세션 고정 공격 방지: 로그인 전 세션은 버리고 새 세션에 인증 정보 저장
+        // 세션 고정 공격 방지
         HttpSession oldSession = httpRequest.getSession(false);
         if (oldSession != null) {
             oldSession.invalidate();
         }
 
-        // 세션에는 지점 id만 principal로 저장, @LoginOrganization으로 꺼내 씀
         var authentication = UsernamePasswordAuthenticationToken.authenticated(organization.getId(), null, List.of());
         SecurityContext context = SecurityContextHolder.createEmptyContext();
         context.setAuthentication(authentication);

@@ -17,7 +17,6 @@ public class WebConfig implements WebMvcConfigurer {
                 .allowedOrigins("http://localhost:3000")
                 .allowedMethods("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS")
                 .allowedHeaders("*")
-                // 세션 쿠키를 주고받기 위해 필요
                 .allowCredentials(true)
                 .maxAge(3600);
     }

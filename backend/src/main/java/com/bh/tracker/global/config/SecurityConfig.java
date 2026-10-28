@@ -29,15 +29,14 @@ public class SecurityConfig {
     public SecurityFilterChain securityFilterChain(HttpSecurity http, ObjectMapper objectMapper) throws Exception {
         http
                 .cors(Customizer.withDefaults())
-                // 세션 쿠키가 SameSite=Lax라 다른 사이트에서 보낸 POST/PATCH엔 쿠키가 실리지 않음
-                // (GET은 실리므로 상태를 바꾸는 요청을 GET으로 받지 않아야 함, 로그아웃도 POST만 허용)
+                // SameSite=Lax 쿠키로 대신 방어. GET엔 쿠키가 실리므로 상태 변경 API는 GET으로 만들지 않음
                 .csrf(AbstractHttpConfigurer::disable)
                 .formLogin(AbstractHttpConfigurer::disable)
                 .httpBasic(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(auth -> auth
-                        // 서블릿 에러 포워딩(/error)이 401로 덮이지 않도록 허용
+                        // /error 포워딩이 401로 덮이지 않도록
                         .dispatcherTypeMatchers(DispatcherType.ERROR).permitAll()
-                        // 로그인 전 화면에서 호출되는 엔드포인트만 인증 없이 허용 (공통기능_API명세.md)
+                        // 로그인 전 화면에서 호출하는 API
                         .requestMatchers(HttpMethod.GET, "/api/organizations").permitAll()
                         .requestMatchers(HttpMethod.POST, "/api/auth/login").permitAll()
                         .anyRequest().authenticated())
@@ -54,7 +53,6 @@ public class SecurityConfig {
         return http.build();
     }
 
-    // 시큐리티 필터 단계의 응답은 컨트롤러를 거치지 않으므로 직접 JSON으로 작성
     private static void writeJson(HttpServletResponse response, ObjectMapper objectMapper,
                                   int status, Object body) throws IOException {
         response.setStatus(status);

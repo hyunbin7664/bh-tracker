@@ -15,12 +15,12 @@ public enum BaseErrorCode implements ErrorCode {
     UNAUTHENTICATED(HttpStatus.UNAUTHORIZED, "COMMON_ERROR_005", "로그인이 필요합니다."),
     METHOD_NOT_ALLOWED(HttpStatus.METHOD_NOT_ALLOWED, "COMMON_ERROR_006", "지원하지 않는 요청 메서드입니다."),
     UNSUPPORTED_MEDIA_TYPE(HttpStatus.UNSUPPORTED_MEDIA_TYPE, "COMMON_ERROR_007", "지원하지 않는 요청 형식입니다."),
-    // 개별 핸들러가 없는 4xx 스프링 예외용. 실제 응답 상태는 예외가 가진 상태를 그대로 사용
+    // 응답 상태는 원래 예외의 4xx 상태를 따름
     UNPROCESSABLE_REQUEST(HttpStatus.BAD_REQUEST, "COMMON_ERROR_008", "처리할 수 없는 요청입니다."),
     UNHANDLED_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "COMMON_ERROR_999", "핸들링하지 않은 서버 오류입니다."),
 
     // 인증
-    // 지점 존재 여부를 노출하지 않도록 지점 미존재와 비밀번호 불일치를 같은 코드로 응답
+    // 지점 존재 여부를 노출하지 않도록 실패 사유를 구분하지 않음
     LOGIN_FAILED(HttpStatus.UNAUTHORIZED, "AUTH_ERROR_001", "지점 또는 비밀번호가 올바르지 않습니다.");
 
     private final HttpStatus httpStatus;

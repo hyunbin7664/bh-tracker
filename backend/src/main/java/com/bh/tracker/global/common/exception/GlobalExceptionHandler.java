@@ -66,7 +66,6 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(HandlerMethodValidationException.class)
     public ResponseEntity<ErrorResponse> handleHandlerMethodValidationException(HandlerMethodValidationException e) {
-        // field와 message를 같은 검증 결과에서 꺼내야 서로 다른 파라미터의 이름·메시지가 섞이지 않음
         ParameterValidationResult result = e.getAllValidationResults().stream().findFirst().orElse(null);
         String field = result != null ? result.getMethodParameter().getParameterName() : null;
         String message = result != null && !result.getResolvableErrors().isEmpty()
@@ -86,7 +85,6 @@ public class GlobalExceptionHandler {
         return toResponse(BaseErrorCode.UNSUPPORTED_MEDIA_TYPE, ErrorResponse.of(BaseErrorCode.UNSUPPORTED_MEDIA_TYPE));
     }
 
-    // 예: 숫자 path variable에 문자열이 들어온 경우
     @ExceptionHandler(MethodArgumentTypeMismatchException.class)
     public ResponseEntity<ErrorResponse> handleMethodArgumentTypeMismatchException(MethodArgumentTypeMismatchException e) {
         log.warn("MethodArgumentTypeMismatchException: {}", e.getMessage());
@@ -96,7 +94,7 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ErrorResponse> handleException(Exception e) {
-        // 개별 핸들러가 없는 스프링 MVC 예외(406 등)도 원래 4xx 상태를 유지해 클라이언트 오류와 서버 오류를 구분
+        // 개별 핸들러가 없는 스프링 4xx 예외(406 등)가 500으로 바뀌지 않게 원래 상태 유지
         if (e instanceof org.springframework.web.ErrorResponse errorResponse
                 && errorResponse.getStatusCode().is4xxClientError()) {
             log.warn("{}: {}", e.getClass().getSimpleName(), e.getMessage());
