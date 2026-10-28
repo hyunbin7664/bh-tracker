@@ -6,14 +6,27 @@ spring:
     driver-class-name: org.postgresql.Driver
   jpa:
     hibernate:
-      ddl-auto: validate
+      # 출시 전까지 update, 출시 시 validate로 전환
+      ddl-auto: update
     show-sql: false
     properties:
       hibernate:
         format_sql: true
+  session:
+    jdbc:
+      # 서버 재시작 후에도 로그인 유지
+      initialize-schema: always
 
 server:
   port: 8080
+  servlet:
+    session:
+      # 로그아웃 전까지 유지 (COM-03), 사실상 무기한
+      timeout: 3650d
+      cookie:
+        max-age: 3650d
+        http-only: true
+        same-site: lax
 
 logging:
   level:
