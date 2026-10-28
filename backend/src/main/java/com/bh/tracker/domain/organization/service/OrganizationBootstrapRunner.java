@@ -36,6 +36,11 @@ public class OrganizationBootstrapRunner implements ApplicationRunner {
     @Override
     @Transactional
     public void run(ApplicationArguments args) {
+        // 지점명은 로그인 시 지점을 고르는 유일 키라, 앞뒤 공백 차이로 같은 지점이 중복 등록되지 않게 정리
+        String name = this.name.trim();
+        if (name.isBlank()) {
+            throw new IllegalStateException("bootstrap.organization.name이 비어 있어 지점을 등록할 수 없습니다.");
+        }
         // 빈 비밀번호로 등록되면 로그인 요청 검증(@NotBlank)에 막혀 지점이 영영 로그인할 수 없음
         if (password.isBlank()) {
             throw new IllegalStateException("bootstrap.organization.password가 비어 있어 지점을 등록할 수 없습니다.");

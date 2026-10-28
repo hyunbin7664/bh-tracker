@@ -1,12 +1,15 @@
 package com.bh.tracker.global.common.exception;
 
 import com.bh.tracker.global.common.response.ErrorResponse;
+import jakarta.validation.ConstraintViolation;
 import jakarta.validation.ConstraintViolationException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.web.HttpMediaTypeNotSupportedException;
 import org.springframework.web.HttpRequestMethodNotSupportedException;
+import org.springframework.validation.FieldError;
+import org.springframework.validation.method.ParameterValidationResult;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.MissingServletRequestParameterException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -39,14 +42,9 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<ErrorResponse> handleMethodArgumentNotValidException(MethodArgumentNotValidException e) {
-        String field = e.getBindingResult().getFieldErrors().stream()
-                .map(error -> error.getField())
-                .findFirst()
-                .orElse(null);
-        String message = e.getBindingResult().getFieldErrors().stream()
-                .map(error -> error.getDefaultMessage())
-                .findFirst()
-                .orElse(BaseErrorCode.INVALID_REQUEST.getMessage());
+        FieldError error = e.getBindingResult().getFieldError();
+        String field = error != null ? error.getField() : null;
+        String message = error != null ? error.getDefaultMessage() : BaseErrorCode.INVALID_REQUEST.getMessage();
         log.warn("ValidationException: {}", message);
         return toResponse(BaseErrorCode.INVALID_REQUEST, ErrorResponse.of(BaseErrorCode.INVALID_REQUEST, message, field));
     }
@@ -59,28 +57,21 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(ConstraintViolationException.class)
     public ResponseEntity<ErrorResponse> handleConstraintViolationException(ConstraintViolationException e) {
-        String field = e.getConstraintViolations().stream()
-                .map(violation -> violation.getPropertyPath().toString())
-                .findFirst()
-                .orElse(null);
-        String message = e.getConstraintViolations().stream()
-                .map(violation -> violation.getMessage())
-                .findFirst()
-                .orElse(BaseErrorCode.INVALID_REQUEST.getMessage());
+        ConstraintViolation<?> violation = e.getConstraintViolations().stream().findFirst().orElse(null);
+        String field = violation != null ? violation.getPropertyPath().toString() : null;
+        String message = violation != null ? violation.getMessage() : BaseErrorCode.INVALID_REQUEST.getMessage();
         log.warn("ConstraintViolationException: {}", message);
         return toResponse(BaseErrorCode.INVALID_REQUEST, ErrorResponse.of(BaseErrorCode.INVALID_REQUEST, message, field));
     }
 
     @ExceptionHandler(HandlerMethodValidationException.class)
     public ResponseEntity<ErrorResponse> handleHandlerMethodValidationException(HandlerMethodValidationException e) {
-        String field = e.getAllValidationResults().stream()
-                .map(result -> result.getMethodParameter().getParameterName())
-                .findFirst()
-                .orElse(null);
-        String message = e.getAllErrors().stream()
-                .map(error -> error.getDefaultMessage())
-                .findFirst()
-                .orElse(BaseErrorCode.INVALID_REQUEST.getMessage());
+        // field와 message를 같은 검증 결과에서 꺼내야 서로 다른 파라미터의 이름·메시지가 섞이지 않음
+        ParameterValidationResult result = e.getAllValidationResults().stream().findFirst().orElse(null);
+        String field = result != null ? result.getMethodParameter().getParameterName() : null;
+        String message = result != null && !result.getResolvableErrors().isEmpty()
+                ? result.getResolvableErrors().get(0).getDefaultMessage()
+                : BaseErrorCode.INVALID_REQUEST.getMessage();
         log.warn("HandlerMethodValidationException: {}", message);
         return toResponse(BaseErrorCode.INVALID_REQUEST, ErrorResponse.of(BaseErrorCode.INVALID_REQUEST, message, field));
     }
@@ -105,6 +96,13 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ErrorResponse> handleException(Exception e) {
+        // 개별 핸들러가 없는 스프링 MVC 예외(406 등)도 원래 4xx 상태를 유지해 클라이언트 오류와 서버 오류를 구분
+        if (e instanceof org.springframework.web.ErrorResponse errorResponse
+                && errorResponse.getStatusCode().is4xxClientError()) {
+            log.warn("{}: {}", e.getClass().getSimpleName(), e.getMessage());
+            return ResponseEntity.status(errorResponse.getStatusCode())
+                    .body(ErrorResponse.of(BaseErrorCode.UNPROCESSABLE_REQUEST));
+        }
         log.error("UnhandledException: {}", e.getMessage(), e);
         return toResponse(BaseErrorCode.UNHANDLED_ERROR, ErrorResponse.of(BaseErrorCode.UNHANDLED_ERROR));
     }
