@@ -1,5 +1,7 @@
 package com.bh.tracker.domain.organization.controller;
 
+import com.bh.tracker.domain.organization.dto.response.OrganizationListResponse;
+import com.bh.tracker.domain.organization.dto.response.OrganizationSummary;
 import com.bh.tracker.domain.organization.service.OrganizationService;
 import com.bh.tracker.global.common.response.ApiResponse;
 import lombok.RequiredArgsConstructor;
@@ -25,8 +27,4 @@ public class OrganizationController {
                 .toList();
         return ApiResponse.ok("지점 목록 조회 성공", new OrganizationListResponse(items));
     }
-
-    record OrganizationListResponse(List<OrganizationSummary> items) {}
-
-    record OrganizationSummary(Long id, String name) {}
 }
