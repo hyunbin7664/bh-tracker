@@ -6,7 +6,8 @@ spring:
     driver-class-name: org.postgresql.Driver
   jpa:
     hibernate:
-      ddl-auto: validate
+      # 출시 전까지 update, 출시 시 validate로 전환
+      ddl-auto: update
     show-sql: false
     properties:
       hibernate:
